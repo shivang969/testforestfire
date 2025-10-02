@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Weather Prediction - SHIVANG Protocol v2.1 (Stable)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        :root {
+            --primary-glow-color: #00d4ff;
+            --secondary-glow-color: #0096ff;
+            --background-dark: #02040a;
+            --container-bg-start: rgba(10, 15, 30, 0.85);
+            --container-bg-end: rgba(5, 8, 20, 0.95);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: var(--background-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
+                radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px);
+            background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px; 
+            background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+            animation: moveStars 120s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes moveStars {
+            from { background-position: 0 0, 40px 60px, 130px 270px, 70px 100px; }
+            to { background-position: -10000px 5000px, -10000px 5000px, -10000px 5000px, -10000px 5000px; }
+        }
+
+        .container {
+            background: linear-gradient(145deg, var(--container-bg-start), var(--container-bg-end));
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 0 80px rgba(0, 150, 255, 0.35),
+                        inset 0 0 20px rgba(0, 180, 255, 0.1);
+            border: 1px solid var(--secondary-glow-color);
+            position: relative;
+            z-index: 1;
+            animation: containerLoad 1s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        @keyframes containerLoad {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .container::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(var(--primary-glow-color) 1px, transparent 1px),
+                linear-gradient(to right, var(--primary-glow-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: -80px 80px; }
+        }
+
+        .corner-bracket {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-style: solid;
+            border-color: var(--primary-glow-color);
+            opacity: 0;
+            animation: cornerLoad 1.5s ease-out 0.5s forwards;
+        }
+        .corner-bracket.top-left { top: 15px; left: 15px; border-width: 2px 0 0 2px; }
+        .corner-bracket.top-right { top: 15px; right: 15px; border-width: 2px 2px 0 0; }
+        .corner-bracket.bottom-left { bottom: 15px; left: 15px; border-width: 0 0 2px 2px; }
+        .corner-bracket.bottom-right { bottom: 15px; right: 15px; border-width: 0 0 2px 2px; }
+
+        @keyframes cornerLoad {
+            from { width: 0; height: 0; opacity: 0; }
+            to { width: 30px; height: 30px; opacity: 0.7; }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .arc-reactor {
+            width: 80px; height: 80px;
+            margin: 0 auto 20px;
+            position: relative;
+            animation: reactorSpin 4s linear infinite;
+        }
+
+        @keyframes reactorSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .arc-reactor::before, .arc-reactor::after {
+            content: ''; position: absolute; border-radius: 50%;
+        }
+
+        .arc-reactor::before {
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, var(--primary-glow-color) 0%, var(--secondary-glow-color) 30%, transparent 70%);
+            box-shadow: 0 0 40px var(--primary-glow-color),
+                        0 0 80px var(--secondary-glow-color),
+                        inset 0 0 40px var(--primary-glow-color);
+            animation: reactorPulse 2s ease-in-out infinite;
+        }
+
+        .arc-reactor::after {
+            width: 60%; height: 60%; top: 20%; left: 20%;
+            background: radial-gradient(circle, #fff 0%, var(--primary-glow-color) 50%, transparent 100%);
+            box-shadow: 0 0 30px #fff;
+        }
+
+        @keyframes reactorPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        h2 {
+            font-size: 2.5em; font-weight: 900;
+            text-align: center; margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, var(--primary-glow-color), #fff, var(--primary-glow-color));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textShine 3s linear infinite;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(0, 150, 255, 0.5);
+        }
+
+        @keyframes textShine {
+            to { background-position: -200% center; }
+        }
+
+        .subtitle {
+            text-align: center; color: var(--primary-glow-color);
+            font-size: 0.9em; letter-spacing: 2px;
+            margin-bottom: 30px; text-transform: uppercase;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px; font-size: 0.8em;
+            color: var(--primary-glow-color); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            transition: all 0.3s ease;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(0, 20, 40, 0.6);
+            color: #fff; font-size: 1em;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary-glow-color);
+            background: rgba(0, 40, 60, 0.8);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4),
+                        inset 0 0 10px rgba(0, 212, 255, 0.1);
+        }
+        
+        input:focus + label {
+            transform: translateY(-2px);
+            text-shadow: 0 0 5px var(--primary-glow-color);
+        }
+
+        input::placeholder {
+            color: rgba(0, 212, 255, 0.4);
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(145deg, var(--secondary-glow-color), #005fcc);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2em; font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase; letter-spacing: 2px;
+            margin-top: 20px; position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 150, 255, 0.4),
+                        0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 20px; height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        button:hover::after {
+            left: 150%;
+            opacity: 1;
+            transition: all 0.8s ease-in-out;
+        }
+
+        button:hover {
+            transform: translateY(-3px); /* FIX: Removed scale(1.02) to prevent overflow */
+            box-shadow: 0 0 50px rgba(0, 150, 255, 0.6),
+                        0 15px 40px rgba(0, 0, 0, 0.6);
+            background: linear-gradient(145deg, var(--primary-glow-color), var(--secondary-glow-color));
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .prediction-result {
+            margin-top: 40px; padding: 25px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.1), rgba(0, 153, 204, 0.15));
+            border-radius: 15px; text-align: center;
+            border: 1px solid var(--primary-glow-color);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2),
+                        inset 0 0 20px rgba(0, 212, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .prediction-result::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+            animation: resultScan 1.2s ease-out forwards;
+        }
+
+        @keyframes resultScan {
+            from { top: 0; opacity: 1; }
+            to { top: 100%; opacity: 0; }
+        }
+
+        .prediction-result h3 {
+            color: var(--primary-glow-color);
+            font-size: 1.3em; line-height: 1.6;
+            text-transform: uppercase; letter-spacing: 1px;
+            text-shadow: 0 0 10px var(--primary-glow-color);
+            opacity: 0;
+            animation: textFadeIn 0.8s ease-out 0.5s forwards;
+            
+            /* FIX: Added properties to wrap long text */
+            overflow-wrap: break-word; /* Standard property */
+            word-wrap: break-word;     /* Legacy property for older browsers */
+        }
+
+        @keyframes textFadeIn {
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 40px 25px;
+            }
+            h2 {
+                font-size: 1.8em;
+            }
+            .arc-reactor {
+                width: 60px; height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="corner-bracket top-left"></div>
+        <div class="corner-bracket top-right"></div>
+        <div class="corner-bracket bottom-left"></div>
+        <div class="corner-bracket bottom-right"></div>
+
+        <div class="header">
+            <div class="arc-reactor"></div>
+            <h2>Fire Protocol</h2>
+            <p class="subtitle">SHIVANG Weather Intelligence</p>
+        </div>
+
+        <form action="/predict" method="post">
+            <div class="form-grid">
+                <div class="form-group">
+                    <input type="number" id="day" name="day" step="any" required placeholder=" ">
+                    <label for="day">Day</label>
+                </div>
+                <div class="form-group">
+                     <input type="number" id="month" name="month" step="any" required placeholder=" ">
+                    <label for="month">Month</label>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="rh" name="RH" step="any" required placeholder=" ">
+                    <label for="rh">RH</label>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="ws" name="Ws" step="any" required placeholder=" ">
+                    <label for="ws">WS</label>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="rain" name="Rain" step="any" required placeholder=" ">
+                    <label for="rain">Rain</label>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="ffmc" name="FFMC" step="any" required placeholder=" ">
+                    <label for="ffmc">FFMC</label>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="dmc" name="DMC" step="any" required placeholder=" ">
+                    <label for="dmc">DMC</label>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="dc" name="DC" step="any" required placeholder=" ">
+                    <label for="dc">DC</label>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="isi" name="ISI" step="any" required placeholder=" ">
+                    <label for="isi">ISI</label>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="bui" name="BUI" step="any" required placeholder=" ">
+                    <label for="bui">BUI</label>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="classes" name="Classes" step="any" required placeholder=" ">
+                    <label for="classes">Classes</label>
+                </div>
+            </div>
+            <button type="submit">Initialize Prediction</button>
+        </form>
+
+        {% if prediction_text %}
+        <div class="prediction-result">
+            <h3>{{ prediction_text }}</h3>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>
