@@ -5,8 +5,8 @@ import pickle
 from sklearn.preprocessing import StandardScaler
 application=Flask(__name__)
 app=application
-lassocv=pickle.load(open('env/first_end_to_end_project/models/ev.pkl','rb'))
-sc=pickle.load(open('env/first_end_to_end_project/models/sc.pkl','rb'))
+lassocv=pickle.load(open('models/ev.pkl','rb'))
+sc=pickle.load(open('models/sc.pkl','rb'))
 @app.route('/')
 def index():
     return render_template('index.html')
